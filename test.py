@@ -1,21 +1,32 @@
 import torch
 
-from lightGE.core.nn import Model, Sequential, Linear, Conv2d
-from lightGE.data import Dataset, DataLoader
-from lightGE.utils import mseLoss, maeLoss, crossEntropyLoss, hingeLoss, multi_classification_kld, mbeLoss, rmseLoss
-from lightGE.core.nn import Linear
-from lightGE.utils.scheduler import MultiStepLR, StepLR, Exponential, Cosine
+
 
 import numpy as np
 
-from lightGE.utils import SGD, Trainer
+
 
 import logging
 
+from torch import nn
+from torch.optim import SGD
+from torch.optim.lr_scheduler import MultiStepLR
+
+from dataloader.dataloader import Dataset, DataLoader
+from loss.loss import mseLoss
+from trainer.trainer import Trainer
+
 logging.basicConfig(level=logging.INFO)
 
+
 # 定义线性层
-m = Linear(2, 1)
+m = nn.Sequential(
+    nn.Linear(2, 1000, dtype=torch.float64),
+    nn.ReLU(),
+    nn.Linear(1000, 1, dtype=torch.float64)
+)
+
+m.to("cuda:0")
 
 # 随机100*2大小的数据服从标准正态分布
 data = np.random.randn(100, 2)
@@ -31,14 +42,14 @@ dataset = Dataset(data, labels)
 train_dataset, test_dataset = dataset.split(0.8)
 
 # 优化器
-opt = SGD(parameters=m.parameters(), lr=0.01)
+opt = SGD(params=m.parameters(), lr=0.000001)
 
-sch = MultiStepLR(opt, [10, 20, 30, 40, 50, 60, 70, 80, 90])
+sch = None
 
 trainer = Trainer(m, opt, mseLoss, {
     "epochs": 100,
     "batch_size": 10,
-    "shuffle": True,
+    "shuffle": False,
     "save_path": "./tmp/model.pkl"
 }, sch)
 

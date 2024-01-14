@@ -1,1 +1,0 @@
-from lightGE.core.mnist.mnist import MNIST

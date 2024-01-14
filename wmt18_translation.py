@@ -1,11 +1,12 @@
 import copy
-import pickle
 
-from lightGE.data.sentenceloader import SentenceLoader
-from lightGE.core.transformer.transformer import Transformer
-from lightGE.utils.optimizer import Adam, SGD
-from lightGE.utils.trainer import Trainer
-from lightGE.utils.loss import multi_classification_cross_entropy_loss
+from torch.optim import Adam
+
+from dataloader.sentenceloader import SentenceLoader
+from loss.loss import multi_classification_cross_entropy_loss
+from trainer.trainer import Trainer
+from transformer.transformer import Transformer
+
 
 if __name__ == "__main__":
     word_vector_size = 512
@@ -26,9 +27,8 @@ if __name__ == "__main__":
                         n_inputs=word_vector_size,
                         n_heads=n_heads, vocab_len=len(train_sentence_loader.tgt_word2vec.wv.key_to_index),
                         hidden_feedforward=2048)
-    optimizer = Adam(parameters=model.parameters(), beta=(0.9, 0.98), d_model=word_vector_size,
-                     warmup_step=400)
-    model_save_path = "tmp/WMT18_model.pkl"
+    optimizer = Adam(params=model.parameters(), lr=0.0001, betas=(0.9, 0.98))
+    model_save_path = "tmp/WMT18_nn.Module.pkl"
     trainer = Trainer(model=model, optimizer=optimizer, loss_fun=multi_classification_cross_entropy_loss,
                       transformer=True,
                       config={
