@@ -1,0 +1,33 @@
+.idea/
+.vs
+.vscode
+venv/
+lightGE/*/__pycache
+
+lry_test.py
+/memory_consumption1.txt
+/memory_consumption2.txt
+/memory_consumption3.txt
+/memory_consumption4.txt
+/memory_consumption5.txt
+/refcount log.txt
+/refcount log1.txt
+/refcount log2.txt
+/refcount log3.txt
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+**/__pycache__
+
+### Model ###
+
+
+### Token ###
+*.segmented
+config.json
+/res/zip_unpack
+/res
+!/res/simple_translation/
