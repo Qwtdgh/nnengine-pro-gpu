@@ -1,6 +1,7 @@
 import numpy as np
 from torch import nn
 from torch import Tensor
+import torch
 
 
 class PositionalEmbedding(nn.Module):
@@ -17,5 +18,5 @@ class PositionalEmbedding(nn.Module):
         self.encoding[:, 1::2] = np.cos(pos / (10000 ** (_2i / embedding_len)))
 
     def forward(self, input: Tensor):
-        return Tensor(self.encoding, requires_grad=False).to("cuda:0")
+        return torch.tensor(self.encoding, requires_grad=False).to("cuda:3")
 

@@ -1,5 +1,5 @@
 import numpy as np
-from gensim.nn.Modules import word2vec
+from gensim.models import word2vec
 
 
 import pickle

@@ -8,7 +8,7 @@ from transformer.feed_forward import FeedForward
 
 
 class EncoderBlock(nn.Module):
-    def __init__(self, batch, sentence_len, n_inputs, n_heads, hidden_feedforward, ndrop_prob=0.9):
+    def __init__(self, batch, sentence_len, n_inputs, n_heads, hidden_feedforward, drop_prob=0.1):
         """
         :param batch:                   batch个数
         :param sentence_len:            句子的长度（一个句子的单词数）
@@ -19,11 +19,11 @@ class EncoderBlock(nn.Module):
         super(EncoderBlock, self).__init__()
         self.multi_attention = MultiAttention(n_heads, n_inputs, False)
         self.add_norm1 = AddNorm(sentence_len, n_inputs)
-        self.dropout1 = nn.Dropout(ndrop_prob)
+        self.dropout1 = nn.Dropout(drop_prob)
 
         self.feedforward = FeedForward(n_inputs, hidden_feedforward)
         self.add_norm2 = AddNorm(sentence_len, n_inputs)
-        self.dropout2 = nn.Dropout(ndrop_prob)
+        self.dropout2 = nn.Dropout(drop_prob)
 
     def forward(self, inputs: Tensor, input_lens) -> Tensor:
         multi_out = self.multi_attention((inputs,), (input_lens,))
@@ -38,13 +38,14 @@ class EncoderBlock(nn.Module):
 
 
 class Encoder(nn.Module):
-    def __init__(self, block_num, batch, sentence_len, n_inputs, n_heads, hidden_feedforward, ndrop_prob=0.9):
+    def __init__(self, block_num, batch, sentence_len, n_inputs, n_heads, hidden_feedforward, drop_prob=0.1):
         super(Encoder, self).__init__()
-        self.blocks = nn.Sequential(OrderedDict([(block_num, EncoderBlock(batch, sentence_len, n_inputs, n_heads, hidden_feedforward, ndrop_prob=ndrop_prob)) for _
-                       in range(block_num)]))
+        self.blocks = nn.Sequential(OrderedDict([("encoder_block" + str(i), EncoderBlock(batch, sentence_len, n_inputs, n_heads,
+                                                                          hidden_feedforward, drop_prob=drop_prob))
+                                                for i in range(block_num)]))
 
     def forward(self, inputs: Tensor, input_lens) -> Tensor:
         x = inputs
-        for block in self.blocks.sub_nn.Modules.values():
+        for name, block in self.blocks.named_children():
             x = block(x, input_lens)
         return x

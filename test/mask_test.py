@@ -45,7 +45,7 @@ class TestMask:
             [T] = pickle.load(open(cached_path, 'rb'))
         else:
             T = Transformer(encoder_block=5, decoder_block=1, batch=batch, sentence_len=sentence_len, n_inputs=n_inputs,
-                            ndrop_prob=1, vocab_len=10)
+                            drop_prob=0.1, vocab_len=10)
             pickle.dump([T], open(cached_path, 'wb'))
 
         y1: Tensor = T(tuple((batchInput1, batchOutput1)), lens=tuple((inputLen, outputLen)))

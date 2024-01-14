@@ -73,7 +73,7 @@ class Trainer(object):
         process_bar = st.progress(0)
         for batch_x, batch_y in bar:
             batch_idx += 1
-            y_truth = torch.tensor(batch_y, requires_grad=False).to("cuda:0")
+            y_truth = torch.tensor(batch_y, requires_grad=False).to("cuda:3")
             if self.transformer is True:
                 y_pred = self.m(self._get_batch_x_tensor(batch_x[0]), lens=batch_x[1])
             else:
@@ -108,7 +108,7 @@ class Trainer(object):
         process_bar = st.progress(0)
         for batch_x, batch_y in bar:
             batch_idx += 1
-            y_truth = torch.tensor(batch_y, requires_grad=False).to("cuda:0")
+            y_truth = torch.tensor(batch_y, requires_grad=False).to("cuda:3")
             if self.transformer is True:
                 y_pred = self.m(self._get_batch_x_tensor(batch_x[0]), lens=batch_x[1])
             else:
@@ -133,10 +133,10 @@ class Trainer(object):
             batch_x = list(batch_x)
             batch_x_tensor = []
             for x in batch_x:
-                batch_x_tensor.append(torch.tensor(x, requires_grad=False).to("cuda:0"))
+                batch_x_tensor.append(torch.tensor(x, requires_grad=False).to("cuda:3"))
             return tuple(batch_x_tensor)
         else:
-            return torch.tensor(batch_x, requires_grad=False).to("cuda:0")
+            return torch.tensor(batch_x, requires_grad=False).to("cuda:3")
 
     def load_model(self, cache_name):
         [self.m, self.opt, self.sche] = pickle.load(open(cache_name, 'rb'))

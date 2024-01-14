@@ -1,5 +1,8 @@
 import math
+from collections import OrderedDict
 from typing import Tuple
+
+import torch
 from torch import nn
 from torch import Tensor
 
@@ -17,9 +20,9 @@ class SelfAttention(nn.Module):
         self.n_inputs = n_inputs
         self.n_outputs = n_outputs
         self.mask = mask
-        self.Wq = nn.nn.Liner(n_inputs, n_outputs)
-        self.Wk = nn.Liner(n_inputs, n_outputs)
-        self.Wv = nn.Liner(n_inputs, n_outputs)
+        self.Wq = nn.Linear(n_inputs, n_outputs, dtype=torch.float64)
+        self.Wk = nn.Linear(n_inputs, n_outputs, dtype=torch.float64)
+        self.Wv = nn.Linear(n_inputs, n_outputs, dtype=torch.float64)
 
     def forward(self, inputs: Tuple[Tensor], masks: Tuple[list]):
         q: Tensor = self.Wq(inputs[0])
@@ -30,12 +33,12 @@ class SelfAttention(nn.Module):
             k: Tensor = self.Wk(inputs[1])
             v: Tensor = self.Wv(inputs[1])
 
-        attention: Tensor = q.bmm(k.transpose((0, 2, 1))) / Tensor(np.array([math.sqrt(self.n_outputs)]))
+        attention: Tensor = torch.matmul(q, k.transpose(1, 2)) / torch.tensor(np.array([math.sqrt(self.n_outputs)]), requires_grad=False).to("cuda:3")
         if self.mask:
             attention = attention + maskMat(attention.shape)
-        attention = lenMask(attention.shape, masks) + attention
-        soft_attention: Tensor = attention.softmax()
-        return soft_attention.bmm(v)
+        attention: Tensor = lenMask(attention.shape, masks) + attention
+        soft_attention: Tensor = attention.softmax(dim=-1)
+        return torch.matmul(soft_attention, v)
 
 
 class MultiAttention(nn.Module):
@@ -51,18 +54,19 @@ class MultiAttention(nn.Module):
         self.n_outputs = n_inputs
         self.self_attention = []
         self.mask = mask
-        for i in range(n_heads):
-            self.self_attention.append(SelfAttention(self.n_inputs, int(self.n_inputs / self.n_heads), self.mask))
-        self.nn.Liner = nn.Liner(self.n_inputs, self.n_outputs)
+        self.self_attention = nn.Sequential(OrderedDict(
+            [("head" + str(i), SelfAttention(self.n_inputs, int(self.n_inputs / self.n_heads), self.mask)) for i in
+             range(n_heads)]))
+        self.linear = nn.Linear(self.n_inputs, self.n_outputs, dtype=torch.float64)
 
     def forward(self, inputs: Tuple[Tensor], masks: Tuple[list]):
-        con = concat([self.self_attention[i](inputs, masks) for i in range(self.n_heads)], axis=-1)
-        return self.nn.Liner(con)
+        con = torch.cat([self.self_attention[i](inputs, masks) for i in range(self.n_heads)], dim=-1)
+        return self.linear(con)
 
 
 def maskMat(shape) -> Tensor:
-    return Tensor(np.array([[-1e9 if j > i else 0 for j in range(shape[-1])] for i in range(shape[-2])]),
-                  requires_grad=False).to("cuda:0")
+    return torch.tensor(np.array([[-1e9 if j > i else 0 for j in range(shape[-1])] for i in range(shape[-2])]),
+                  requires_grad=False).to("cuda:3")
 
 
 def lenMask(shape, masks: Tuple[list]):
@@ -72,7 +76,8 @@ def lenMask(shape, masks: Tuple[list]):
     else:
         mask_j = masks[1]
 
-    return Tensor(np.array([[[-1e9 if j >= mask_j[b_index] or i >= mask_i[b_index] else 0 for j in range(shape[2])] for i in range(shape[1])] for b_index in range(shape[0])]))
+    return torch.tensor(np.array([[[-1e9 if j >= mask_j[b_index] or i >= mask_i[b_index] else 0 for j in range(shape[2])] for
+                             i in range(shape[1])] for b_index in range(shape[0])]), requires_grad=False).to("cuda:3")
 
 # s = Self_Attention(4, 5)
 #
@@ -80,5 +85,3 @@ def lenMask(shape, masks: Tuple[list]):
 # X = Tensor(np.array(np.random.randn(5, 4)))
 # y = s((X,))
 # print(y.shape)
-
-

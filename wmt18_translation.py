@@ -27,8 +27,12 @@ if __name__ == "__main__":
                         n_inputs=word_vector_size,
                         n_heads=n_heads, vocab_len=len(train_sentence_loader.tgt_word2vec.wv.key_to_index),
                         hidden_feedforward=2048)
+    model.to("cuda:3")
+    # for name, param in model.named_parameters():
+    #     print(name, param.device)
+    # exit(0)
     optimizer = Adam(params=model.parameters(), lr=0.0001, betas=(0.9, 0.98))
-    model_save_path = "tmp/WMT18_nn.Module.pkl"
+    model_save_path = "tmp/WMT18_model.pkl"
     trainer = Trainer(model=model, optimizer=optimizer, loss_fun=multi_classification_cross_entropy_loss,
                       transformer=True,
                       config={

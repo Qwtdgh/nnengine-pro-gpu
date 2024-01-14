@@ -16,9 +16,9 @@ class AddNorm(Module):
         self.n_inputs = n_inputs
         self.sentence_len = sentence_len
         self.n_inputs = n_inputs
-        self.gamma = torch.tensor(np.array(np.ones((1, self.sentence_len, self.n_inputs))), requires_grad=True).to("cuda:0")
-        self.beta = torch.tensor(np.array(np.zeros((1, self.sentence_len, self.n_inputs))), requires_grad=True).to("cuda:0")
-        self.eps = Tensor(np.array(np.zeros((1, self.sentence_len, self.n_inputs))) + 1e-12, requires_grad=False).to("cuda:0")
+        self.gamma = torch.tensor(np.array(np.ones((1, self.sentence_len, self.n_inputs))), requires_grad=True).to("cuda:3")
+        self.beta = torch.tensor(np.array(np.zeros((1, self.sentence_len, self.n_inputs))), requires_grad=True).to("cuda:3")
+        self.eps = torch.tensor(np.array(np.zeros((1, self.sentence_len, self.n_inputs))) + 1e-12, requires_grad=False).to("cuda:3")
 
     def forward(self, inputs: Tuple[Tensor]):
         inputs = inputs[0] + inputs[1]
