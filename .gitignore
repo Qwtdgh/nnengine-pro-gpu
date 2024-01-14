@@ -28,6 +28,3 @@ __pycache__/
 ### Token ###
 *.segmented
 config.json
-/res/zip_unpack
-/res
-!/res/simple_translation/
