@@ -33,7 +33,7 @@ class SelfAttention(nn.Module):
             k: Tensor = self.Wk(inputs[1])
             v: Tensor = self.Wv(inputs[1])
 
-        attention: Tensor = torch.matmul(q, k.transpose(1, 2)) / torch.tensor(np.array([math.sqrt(self.n_outputs)]), requires_grad=False).to("cuda:3")
+        attention: Tensor = torch.matmul(q, k.transpose(1, 2)) / torch.tensor(np.array([math.sqrt(self.n_outputs)]), requires_grad=False).to("cuda:0")
         if self.mask:
             attention = attention + maskMat(attention.shape)
         attention: Tensor = lenMask(attention.shape, masks) + attention
@@ -66,7 +66,7 @@ class MultiAttention(nn.Module):
 
 def maskMat(shape) -> Tensor:
     return torch.tensor(np.array([[-1e9 if j > i else 0 for j in range(shape[-1])] for i in range(shape[-2])]),
-                  requires_grad=False).to("cuda:3")
+                  requires_grad=False).to("cuda:0")
 
 
 def lenMask(shape, masks: Tuple[list]):
@@ -77,7 +77,7 @@ def lenMask(shape, masks: Tuple[list]):
         mask_j = masks[1]
 
     return torch.tensor(np.array([[[-1e9 if j >= mask_j[b_index] or i >= mask_i[b_index] else 0 for j in range(shape[2])] for
-                             i in range(shape[1])] for b_index in range(shape[0])]), requires_grad=False).to("cuda:3")
+                             i in range(shape[1])] for b_index in range(shape[0])]), requires_grad=False).to("cuda:0")
 
 # s = Self_Attention(4, 5)
 #

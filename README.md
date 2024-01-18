@@ -24,6 +24,22 @@ BUAA 2023 硕士高等软工课程设计 GPU版
 
 
 
+## 项目运行
+
+在A100上进行transformer机器翻译任务训练，大约占用10G GPU内存
+
+```shell
+python wmt18_translation.py
+```
+
+
+
+## Transformer机器翻译任务
+
+![image-20240118094034892](https://typoraqlh.oss-cn-beijing.aliyuncs.com/qlh/typora/image-20240118094034892.png)
+
+
+
 ## gitlab协作
 
 ### 1. 暂存本地修改

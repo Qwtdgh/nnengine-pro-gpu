@@ -1,3 +1,4 @@
+import pickle
 import sys
 
 import torch
@@ -62,7 +63,7 @@ class Transformer(nn.Module):
 
         tgt_array = np.array([[start_embedding]])
         tgt_array = np.pad(tgt_array, ((0, 0), (0, sentence_loader.max_sentence_len - len(tgt_array[0])), (0, 0)), mode='constant')
-        tgt = Tensor(tgt_array, requires_grad=False).to("cuda:3")
+        tgt = Tensor(tgt_array, requires_grad=False).to("cuda:0")
         tgt_len = [1]
         src = src + self.positionalEmbedding.forward(None)
         encoders_output = self.encoder(src, src_len)
@@ -81,15 +82,18 @@ class Transformer(nn.Module):
         return out
 
 
-def predict(english, sentence_loader, model: nn.Module):
+def predict(english, sentence_loader, model):
+    sentence_loader = pickle.load(open(sentence_loader, "rb+"))
+    model = pickle.load(open(model, "rb+"))
+    model = model[0]
     model.eval()
     tokens = add_start_end_token(english).strip().split()
     src_len = len(tokens)
-    src = Tensor(np.array([[sentence_loader.src_word2vec.wv[tokens[i]].tolist()
+    src = torch.tensor(np.array([[sentence_loader.src_word2vec.wv[tokens[i]].tolist()
                             if i < src_len
                             else [0 for _ in range(sentence_loader.word_vector_size)]] for i in
                            range(sentence_loader.max_sentence_len)]
-                          ).reshape(1, sentence_loader.max_sentence_len, -1), requires_grad=False).to("cuda:3")
+                          ).reshape(1, sentence_loader.max_sentence_len, -1), requires_grad=False).to("cuda:0")
     out = model.predict(src, len=src_len, sentence_loader=sentence_loader)
     model.train()
     return out
@@ -97,8 +101,7 @@ def predict(english, sentence_loader, model: nn.Module):
 
 if __name__ == '__main__':
     english = input()
-    out = predict(english, "../../../res/simple_translation/simple_translation_5.sl",
-                  "../../../tmp/translation_simple_5.pkl")
+    out = predict(english, "../res/simple_translation/simple_translation_en.txt.sentenceloader", "../tmp/WMT18_model.pkl")
     sys.exit(0)
     batch = 10
     sentence_len = 10

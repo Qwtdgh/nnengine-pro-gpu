@@ -16,9 +16,9 @@ def maeLoss(pred: Tensor, target: Tensor) -> Tensor:
 def crossEntropyLoss(pred: Tensor, target: Tensor) -> Tensor:
     # return -target * pred.log() - (Tensor(np.ones_like(pred.data)) - target) * (
     #            Tensor(np.ones_like(pred.data)) - pred.log())
-    # return (-target * pred.log()).sum(axes=None) / Tensor(np.array(pred.shape[0]), requires_grad=False).to("cuda:3")
+    # return (-target * pred.log()).sum(axes=None) / Tensor(np.array(pred.shape[0]), requires_grad=False).to("cuda:0")
     # pred加一个极小数防止除0
-    return -target * (pred + Tensor(np.array(1e-300), requires_grad=False).to("cuda:3")).log()
+    return -target * (pred + Tensor(np.array(1e-300), requires_grad=False).to("cuda:0")).log()
 
 
 def huberLoss(pred: Tensor, target: Tensor) -> Tensor:
@@ -46,7 +46,7 @@ def multi_classification_cross_entropy_loss(pred: Tensor, target: Tensor) -> Ten
             tgt_len.append(target.cpu().numpy()[i].shape[0])
         else:
             tgt_len.append(zero_rows[0])
-    return (-target * pred.log()).sum((0, 1, 2)) / torch.tensor(np.array(sum(tgt_len)), requires_grad=False).to("cuda:3")
+    return (-target * pred.log()).sum((0, 1, 2)) / torch.tensor(np.array(sum(tgt_len)), requires_grad=False).to("cuda:0")
 
 
 def rmseLoss(pred: Tensor, target: Tensor) -> Tensor:
@@ -80,7 +80,7 @@ def multi_classification_kld(pred: Tensor, target: Tensor) -> Tensor:
             tgt_len.append(target.data[i].shape[0])
         else:
             tgt_len.append(zero_rows[0])
-    return (-target * (target / pred).log()).sum((0, 1, 2)) / Tensor(np.array(sum(tgt_len)), requires_grad=False).to("cuda:3")
+    return (-target * (target / pred).log()).sum((0, 1, 2)) / Tensor(np.array(sum(tgt_len)), requires_grad=False).to("cuda:0")
 
 
 class LossFuncFactory:

@@ -26,7 +26,7 @@ m = nn.Sequential(
     nn.Linear(1000, 1, dtype=torch.float64)
 )
 
-m.to("cuda:3")
+m.to("cuda:0")
 
 # 随机100*2大小的数据服从标准正态分布
 data = np.random.randn(100, 2)

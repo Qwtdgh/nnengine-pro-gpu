@@ -5,13 +5,13 @@ from torch.optim import Adam
 from dataloader.sentenceloader import SentenceLoader
 from loss.loss import multi_classification_cross_entropy_loss
 from trainer.trainer import Trainer
-from transformer.transformer import Transformer
+from transformer.trans import Transformer
 
 
 if __name__ == "__main__":
-    word_vector_size = 512
-    n_heads = 8
-    epochs = 1000
+    word_vector_size = 10
+    n_heads = 2
+    epochs = 3
     batch = 100
 
     sentence_loader = SentenceLoader(word_vector_size=word_vector_size)
@@ -26,8 +26,8 @@ if __name__ == "__main__":
     model = Transformer(batch=batch, sentence_len=train_sentence_loader.max_sentence_len,
                         n_inputs=word_vector_size,
                         n_heads=n_heads, vocab_len=len(train_sentence_loader.tgt_word2vec.wv.key_to_index),
-                        hidden_feedforward=2048)
-    model.to("cuda:3")
+                        hidden_feedforward=16)
+    model.to("cuda:0")
     # for name, param in model.named_parameters():
     #     print(name, param.device)
     # exit(0)
