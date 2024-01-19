@@ -32,12 +32,15 @@ BUAA 2023 硕士高等软工课程设计 GPU版
 python wmt18_translation.py
 ```
 
+推理
 
+```shell
+python trans_pred.py
+```
 
 ## Transformer机器翻译任务
 
 ![image-20240118094034892](https://typoraqlh.oss-cn-beijing.aliyuncs.com/qlh/typora/image-20240118094034892.png)
-
 
 
 ## gitlab协作
